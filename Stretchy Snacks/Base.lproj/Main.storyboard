@@ -50,6 +50,8 @@
                     </view>
                     <connections>
                         <outlet property="navHeightConstraint" destination="d6c-di-1Zi" id="3Ms-28-FZr"/>
+                        <outlet property="plusButton" destination="0nq-sD-yzA" id="b5S-gE-Nr1"/>
+                        <outlet property="snackView" destination="GJE-8B-s4h" id="UIW-kg-pFo"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
