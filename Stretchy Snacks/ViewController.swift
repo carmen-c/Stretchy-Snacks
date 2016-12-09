@@ -21,6 +21,12 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                 self.navHeightConstraint.constant = 64
                 self.stackView.isHidden = true
                 
+                for aConstraint in self.snackView.constraints{
+                    if aConstraint.identifier == "centerYSnackTitle"{
+                        self.offset = 0
+                    }
+                }
+                
             }else if self.navHeightConstraint.constant == 64 {
                 self.plusButton.transform = CGAffineTransform(rotationAngle: CGFloat(M_PI_4))
                 self.navHeightConstraint.constant = 200
@@ -28,10 +34,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                 
                 for aConstraint in self.snackView.constraints{
                     if aConstraint.identifier == "centerYSnackTitle"{
-                        aConstraint.isActive = false
-                    }
-                    if aConstraint.identifier == "alt"{
-                        aConstraint.isActive = true
+                        self.offset = -40
                     }
                 }
                 
@@ -41,6 +44,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         }, completion: nil)
         
     }
+    
     
     func handleTap(_ sender: UITapGestureRecognizer) {
         
@@ -76,7 +80,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     var tableArray = [String]()
     var counter = 0
     let snacksArray = ["oreos", "pizza_pockets", "pop_tarts", "popsicle", "ramen"]
-    
+    var offset = 0
     
     // MARK: Views
     override func viewDidLoad() {
@@ -119,8 +123,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             snackDisplay.accessibilityIdentifier = "snackimage\(self.counter)"
             snackDisplay.image = UIImage(named: snack)
             snackDisplay.translatesAutoresizingMaskIntoConstraints = false
-//            snackDisplay.heightAnchor.constraint(equalToConstant: 100.0).isActive = true
-//            snackDisplay.widthAnchor.constraint(equalToConstant: 50.0).isActive = true
+            snackDisplay.heightAnchor.constraint(equalToConstant: 100.0).isActive = true
+            snackDisplay.widthAnchor.constraint(equalToConstant: 50.0).isActive = true
             
             snackDisplay.isUserInteractionEnabled = true
             let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:)))
@@ -154,18 +158,12 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         let labelx = NSLayoutConstraint(item: label, attribute: NSLayoutAttribute.centerX, relatedBy: NSLayoutRelation.equal, toItem: snackView, attribute: NSLayoutAttribute.centerX, multiplier: 1.0, constant: 0)
         
-        let labely = NSLayoutConstraint(item: label, attribute: NSLayoutAttribute.centerY, relatedBy: NSLayoutRelation.equal, toItem: snackView, attribute: NSLayoutAttribute.centerY, multiplier: 1.0, constant: 0)
-        
-        let labelyalt = NSLayoutConstraint(item: label, attribute: NSLayoutAttribute.centerY, relatedBy: NSLayoutRelation.equal, toItem: snackView, attribute: NSLayoutAttribute.centerY, multiplier: 1.0, constant: -40)
+        let labely = NSLayoutConstraint(item: label, attribute: NSLayoutAttribute.centerY, relatedBy: NSLayoutRelation.equal, toItem: snackView, attribute: NSLayoutAttribute.centerY, multiplier: 1.0, constant: CGFloat(self.offset))
         
         labely.identifier = "centerYSnackTitle"
-        labelyalt.identifier = "alt"
-        labelyalt.isActive = false
-        
         self.snackView.addConstraint(labelx)
         self.snackView.addConstraint(labely)
-        self.snackView.addConstraint(labelyalt)
-        
+      
     }
     
     
