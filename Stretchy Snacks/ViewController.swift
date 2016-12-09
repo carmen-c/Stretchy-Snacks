@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     
     // MARK: Buttons
@@ -25,6 +25,16 @@ class ViewController: UIViewController {
                 self.plusButton.transform = CGAffineTransform(rotationAngle: CGFloat(M_PI_4))
                 self.navHeightConstraint.constant = 200
                 self.stackView.isHidden = false
+                
+                for aConstraint in self.snackView.constraints{
+                    if aConstraint.identifier == "centerYSnackTitle"{
+                        aConstraint.isActive = false
+                    }
+                    if aConstraint.identifier == "alt"{
+                        aConstraint.isActive = true
+                    }
+                }
+                
             }
             self.view.layoutIfNeeded()
             
@@ -32,29 +42,52 @@ class ViewController: UIViewController {
         
     }
     
-    
+    func handleTap(_ sender: UITapGestureRecognizer) {
+        
+        if let testString = sender.view!.accessibilityIdentifier! as String! {
+            
+            switch testString{
+                
+            case "snackimage1":
+                self.tableArray.append("oreos")
+            case "snackimage2":
+                self.tableArray.append("pizza pockets")
+            case "snackimage3":
+                self.tableArray.append("pop tarts")
+            case "snackimage4":
+                self.tableArray.append("popsicle")
+            case "snackimage5":
+                self.tableArray.append("ramen")
+            default:
+                break
+                
+            }
+            self.snackTableView.reloadData()
+        }
+    }
     
     // MARK: Properties
     @IBOutlet weak var navHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var plusButton: UIButton!
     @IBOutlet weak var snackView: UIView!
+    @IBOutlet weak var snackTableView: UITableView!
+    
     let stackView = UIStackView()
+    var tableArray = [String]()
+    var counter = 0
+    let snacksArray = ["oreos", "pizza_pockets", "pop_tarts", "popsicle", "ramen"]
+    
     
     // MARK: Views
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         addStackView()
         addSnackViews()
         self.stackView.isHidden = true
+        navBarTitle()
+        
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
-    
     func addStackView() {
         stackView.alignment = .leading
         stackView.spacing = 5.0
@@ -76,41 +109,66 @@ class ViewController: UIViewController {
         self.snackView.addConstraint(stackConstraintBottom)
         self.snackView.addConstraint(stackConstraintLeft)
         self.snackView.addConstraint(stackConstraintRight)
-        
-    
     }
-    
+
     func addSnackViews() {
-        let snack1 = UIImageView()
-        snack1.image = UIImage(named: "oreos")
-        snack1.heightAnchor.constraint(equalToConstant: 100.0).isActive = true
-        snack1.widthAnchor.constraint(equalToConstant: 50.0).isActive = true
         
-        let snack2 = UIImageView()
-        snack2.image = UIImage(named: "pizza_pockets")
-        snack2.heightAnchor.constraint(equalToConstant: 100.0).isActive = true
-        snack2.widthAnchor.constraint(equalToConstant: 50.0).isActive = true
+            for snack in snacksArray {
+            self.counter += 1
+            let snackDisplay = UIImageView()
+            snackDisplay.accessibilityIdentifier = "snackimage\(self.counter)"
+            snackDisplay.image = UIImage(named: snack)
+            snackDisplay.translatesAutoresizingMaskIntoConstraints = false
+//            snackDisplay.heightAnchor.constraint(equalToConstant: 100.0).isActive = true
+//            snackDisplay.widthAnchor.constraint(equalToConstant: 50.0).isActive = true
+            
+            snackDisplay.isUserInteractionEnabled = true
+            let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:)))
+            snackDisplay.addGestureRecognizer(tap)
+            self.stackView.addArrangedSubview(snackDisplay)
+        }
         
-        let snack3 = UIImageView()
-        snack3.image = UIImage(named: "pop_tarts")
-        snack3.heightAnchor.constraint(equalToConstant: 100.0).isActive = true
-        snack3.widthAnchor.constraint(equalToConstant: 50.0).isActive = true
-        
-        let snack4 = UIImageView()
-        snack4.image = UIImage(named: "popsicle")
-        snack4.heightAnchor.constraint(equalToConstant: 100.0).isActive = true
-        snack4.widthAnchor.constraint(equalToConstant: 50.0).isActive = true
-        
-        let snack5 = UIImageView()
-        snack5.image = UIImage(named: "ramen")
-        snack5.heightAnchor.constraint(equalToConstant: 100.0).isActive = true
-        snack5.widthAnchor.constraint(equalToConstant: 50.0).isActive = true
-        
-        self.stackView.addArrangedSubview(snack1)
-        self.stackView.addArrangedSubview(snack2)
-        self.stackView.addArrangedSubview(snack3)
-        self.stackView.addArrangedSubview(snack4)
-        self.stackView.addArrangedSubview(snack5)
     }
+    
+    // MARK: Table View
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = self.snackTableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        let moo = self.tableArray[indexPath.row] 
+        cell.textLabel?.text = moo
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return self.tableArray.count
+    }
+    
+    // MARK: Snack Title
+    func navBarTitle() {
+        
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textAlignment = .center
+        label.text = "SNACKS"
+        self.snackView.addSubview(label)
+        
+        let labelx = NSLayoutConstraint(item: label, attribute: NSLayoutAttribute.centerX, relatedBy: NSLayoutRelation.equal, toItem: snackView, attribute: NSLayoutAttribute.centerX, multiplier: 1.0, constant: 0)
+        
+        let labely = NSLayoutConstraint(item: label, attribute: NSLayoutAttribute.centerY, relatedBy: NSLayoutRelation.equal, toItem: snackView, attribute: NSLayoutAttribute.centerY, multiplier: 1.0, constant: 0)
+        
+        let labelyalt = NSLayoutConstraint(item: label, attribute: NSLayoutAttribute.centerY, relatedBy: NSLayoutRelation.equal, toItem: snackView, attribute: NSLayoutAttribute.centerY, multiplier: 1.0, constant: -40)
+        
+        labely.identifier = "centerYSnackTitle"
+        labelyalt.identifier = "alt"
+        labelyalt.isActive = false
+        
+        self.snackView.addConstraint(labelx)
+        self.snackView.addConstraint(labely)
+        self.snackView.addConstraint(labelyalt)
+        
+    }
+    
+    
+    
 }
 
